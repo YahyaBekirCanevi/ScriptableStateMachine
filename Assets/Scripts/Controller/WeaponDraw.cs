@@ -27,18 +27,10 @@ public class WeaponDraw : MonoBehaviour
             StopCoroutine("DisappearAfterDelay");
             StopCoroutine("DisarmAfterDelay");
             DrawWeapon();
-            idleWaiting = false;
-            return;
         }
-        if (onHand && idleWaiting)
+        if (onHand && !playerAttackStateService.Charging && !idleWaiting)
         {
-            idleWaiting = false;
             StartCoroutine("DisarmAfterDelay");
-        }
-        if (!onHand)
-        {
-            idleWaiting = true;
-            StopCoroutine("DisarmAfterDelay");
         }
     }
 
@@ -47,7 +39,7 @@ public class WeaponDraw : MonoBehaviour
         handPositionedWeapon.SetActive(true);
         backPositionedWeapon.SetActive(false);
         onHand = true;
-        idleWaiting = true;
+        idleWaiting = false;
         playerAttackStateService.Disarmed = false;
         playerAttackStateService.Disappeared = false;
     }
