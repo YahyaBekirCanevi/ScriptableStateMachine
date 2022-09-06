@@ -38,22 +38,26 @@ public class CameraController : MonoBehaviour
         MouseY -= Input.GetAxis("Mouse Y") * cameraModel.YRotationSpeed;
         MouseY = Mathf.Clamp(MouseY, cameraModel.ClampMin, cameraModel.ClampMax);
     }
-    float time = 1;
+    float time1 = 1;
+    float time2 = 1;
     private void FollowPlayer()
     {
         Vector3 desiredPosition = playerTransform.position + cameraModel.Offset;
         transform.position = desiredPosition;
 
-        time += Time.deltaTime * cameraModel.FollowSpeed * (playerMotionStateService.State == CharacterState.idle ? -1 : 1);
-        time = Mathf.Clamp(time, 0, 1);
+        time1 += Time.deltaTime * cameraModel.FollowSpeed * (playerMotionStateService.State == CharacterState.idle ? -1 : 1);
+        time1 = Mathf.Clamp(time1, 0, 1);
 
-        Vector3 desiredCameraPosition = playerAttackStateService.Charging ? cameraModel.AimedCameraPosition : cameraModel.CameraPosition;
+        time2 += Time.deltaTime * 2 * (playerAttackStateService.Charging ? 1 : -1);
+        time2 = Mathf.Clamp(time2, 0, 1);
+
+        Vector3 desiredCameraPosition = Vector3.Lerp(cameraModel.CameraPosition, cameraModel.AimedCameraPosition, time2);
 
         Vector3 movementDistance = (playerAttackStateService.Charging ? (Vector3.forward * .4f) : Vector3.back) * cameraModel.MaxDistanceFromPlayer;
         cam.transform.localPosition = Vector3.Lerp(
             desiredCameraPosition,
             desiredCameraPosition + movementDistance,
-            time
+            time1
         );
     }
     private void Rotate()

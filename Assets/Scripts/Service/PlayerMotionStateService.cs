@@ -8,6 +8,7 @@ public class PlayerMotionStateService : MonoBehaviour
     private float horizontal;
     [SerializeField] private float landHeight = 3;
     [SerializeField] private GroundCheckController groundCheck;
+    [SerializeField, ReadOnly] private float moveSpeed;
     [SerializeField, ReadOnly] private bool isJumping = false;
     [SerializeField, ReadOnly] private bool isRunning = false;
     [SerializeField, ReadOnly] private bool isGrounded = true;
@@ -19,6 +20,7 @@ public class PlayerMotionStateService : MonoBehaviour
     public float Vertical { get => vertical; }
     public float Horizontal { get => horizontal; }
     public float Speed { get; set; }
+    public float MoveSpeed { get; }
     public bool IsJumping { get => isJumping; }
     public bool IsRunning { get => isRunning; }
     public bool IsGrounded { get => isGrounded; }
@@ -37,6 +39,7 @@ public class PlayerMotionStateService : MonoBehaviour
         CheckGrounded();
         State = SetState();
         Speed = GetPlayerCurrentSpeed();
+        moveSpeed = Mathf.Abs(horizontal) + Mathf.Abs(vertical);
     }
     private void CheckGrounded()
     {
@@ -54,12 +57,10 @@ public class PlayerMotionStateService : MonoBehaviour
         isRunning = Input.GetKey(KeyCode.LeftShift);
     }
 
-    private float GetPlayerCurrentSpeed() => State == CharacterState.run ? player.RunSpeed : player.WalkSpeed;
+    private float GetPlayerCurrentSpeed() => isGrounded ? State == CharacterState.run ? player.RunSpeed : player.WalkSpeed : Speed;
 
     private CharacterState SetState()
     {
-        float moveSpeed = Mathf.Abs(horizontal) + Mathf.Abs(vertical);
-
         if (moveSpeed < .1f)
         {
             return CharacterState.idle;

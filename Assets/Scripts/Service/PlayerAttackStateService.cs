@@ -4,6 +4,7 @@ using UnityEngine;
 public class PlayerAttackStateService : MonoBehaviour
 {
     private PlayerAimController playerAimController;
+    private PlayerMotionStateService playerMotionStateService;
     [SerializeField] private Player player;
     [SerializeField, ReadOnly] private bool isAttacking = false;
     [SerializeField, ReadOnly] private bool charging = false;
@@ -19,15 +20,20 @@ public class PlayerAttackStateService : MonoBehaviour
     private void Awake()
     {
         playerAimController = GetComponent<PlayerAimController>();
+        playerMotionStateService = player.GetComponent<PlayerMotionStateService>();
     }
     private void Update()
     {
         isAttacking = Input.GetKeyDown(KeyCode.Mouse0);
         ButtonUp = Input.GetKeyUp(KeyCode.Mouse0);
-        if (isAttacking) charging = true;
-        if (charging)
+        if (!playerMotionStateService.IsGrounded)
         {
-            hitTargetController = playerAimController.HitTarget;
+            charging = false;
+        }
+        else
+        {
+            if (isAttacking) charging = true;
+            if (charging) hitTargetController = playerAimController.HitTarget;
         }
     }
     public void Attack()
