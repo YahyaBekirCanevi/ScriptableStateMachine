@@ -7,6 +7,7 @@ public class WeaponDraw : MonoBehaviour
     private bool idleWaiting = false;
     private bool drawWeaponStatement;
     private PlayerAttackStateService playerAttackStateService;
+    [SerializeField] private PlayerMotionStateService playerMotionStateService;
     [SerializeField] private GameObject handPositionedWeapon;
     [SerializeField] private GameObject backPositionedWeapon;
     [SerializeField, Tooltip("The Duration for weapon to disarm")] private float disarmDelay = 3;
@@ -27,6 +28,11 @@ public class WeaponDraw : MonoBehaviour
             StopCoroutine("DisappearAfterDelay");
             StopCoroutine("DisarmAfterDelay");
             DrawWeapon();
+        }
+        if (!playerAttackStateService.Disarmed && !playerAttackStateService.Charging &&
+            (playerMotionStateService.MoveSpeed > 0 || playerMotionStateService.IsGrounded))
+        {
+            DisarmWeapon();
         }
         if (onHand && !playerAttackStateService.Charging && !idleWaiting)
         {

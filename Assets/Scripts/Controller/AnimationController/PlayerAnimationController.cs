@@ -21,6 +21,7 @@ public class PlayerAnimationController : MonoBehaviour
 
         anim.SetFloat("vertical", playerMotionStateService.Vertical);
         anim.SetFloat("horizontal", playerMotionStateService.Horizontal);
+
         if (playerAttackStateService.ButtonUp)
         {
             anim.SetBool("chargeButtonUp", true);
@@ -31,7 +32,20 @@ public class PlayerAnimationController : MonoBehaviour
         if (!anim.GetBool("charge"))
         {
             playerAttackStateService.Charging = false;
+            anim.SetBool("cancelAttack", false);
             anim.SetBool("chargeButtonUp", false);
+        }
+        else
+        {
+            if (!playerAttackStateService.Charging)
+            {
+                anim.SetBool("cancelAttack", true);
+                anim.SetBool("charge", false);
+            }
+            else
+            {
+                anim.SetBool("cancelAttack", false);
+            }
         }
     }
 
