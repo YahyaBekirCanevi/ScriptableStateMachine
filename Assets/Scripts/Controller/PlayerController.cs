@@ -42,16 +42,10 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            FaceForward();
             CorrespondPlayerMovement();
         }
     }
 
-    private void FaceForward()
-    {
-        if (movementDirection == Vector3.zero) return;
-        transform.forward = movementDirection;
-    }
     private void CorrespondPlayerMovement()
     {
         movementDirection =
@@ -60,6 +54,18 @@ public class PlayerController : MonoBehaviour
 
         movementDirection.y = 0;
         movementDirection = movementDirection.normalized * playerMotionStateService.Speed;
+        if (playerAttackStateService.Charging)
+        {
+            Vector3 forward = cam.forward;
+            forward.y = 0;
+            forward.Normalize();
+            transform.forward = forward;
+        }
+        else
+        {
+            if (movementDirection != Vector3.zero)
+                transform.forward = movementDirection;
+        }
         if (playerMotionStateService.IsGrounded)
         {
             if (playerMotionStateService.IsJumping)

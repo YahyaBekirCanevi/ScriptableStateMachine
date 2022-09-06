@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class CrosshairController : MonoBehaviour
 {
-    [SerializeField] private GameObject crosshair;
     [SerializeField] private PlayerAttackStateService playerAttackStateService;
     private Animator anim;
     private void Awake()

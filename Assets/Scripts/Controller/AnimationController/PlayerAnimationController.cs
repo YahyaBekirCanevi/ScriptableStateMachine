@@ -18,6 +18,21 @@ public class PlayerAnimationController : MonoBehaviour
         else
             StopCoroutine("RandomEmote");
 
+
+        anim.SetFloat("vertical", playerMotionStateService.Vertical);
+        anim.SetFloat("horizontal", playerMotionStateService.Horizontal);
+        if (playerAttackStateService.ButtonUp)
+        {
+            anim.SetBool("chargeButtonUp", true);
+            playerAttackStateService.Attack();
+        }
+        if (playerAttackStateService.IsAttacking)
+            anim.SetBool("charge", true);
+        if (!anim.GetBool("charge"))
+        {
+            playerAttackStateService.Charging = false;
+            anim.SetBool("chargeButtonUp", false);
+        }
     }
 
     private IEnumerator RandomEmote()

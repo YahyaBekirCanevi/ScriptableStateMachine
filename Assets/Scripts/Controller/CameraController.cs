@@ -5,6 +5,7 @@ public class CameraController : MonoBehaviour
 {
     [SerializeField] private Transform playerTransform;
     [SerializeField] private PlayerMotionStateService playerMotionStateService;
+    [SerializeField] private PlayerAttackStateService playerAttackStateService;
     private CameraModel cameraModel;
     private Camera cam;
     private float MouseX { get; set; }
@@ -12,11 +13,14 @@ public class CameraController : MonoBehaviour
     Vector3 velocity = Vector3.zero;
     private void Awake()
     {
+        Cursor.visible = false;
         cameraModel = GetComponent<CameraModel>();
         cam = transform.GetChild(0).GetComponent<Camera>();
     }
+
     private void Update()
     {
+        LockCursor();
         GetInputs();
         Rotate();
     }
@@ -24,7 +28,10 @@ public class CameraController : MonoBehaviour
     {
         FollowPlayer();
     }
-
+    private void LockCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+    }
     private void GetInputs()
     {
         MouseX += Input.GetAxis("Mouse X") * cameraModel.XRotationSpeed;
@@ -37,14 +44,15 @@ public class CameraController : MonoBehaviour
         Vector3 desiredPosition = playerTransform.position + cameraModel.Offset;
         transform.position = desiredPosition;
 
-        float distanceToPlayer = cameraModel.MaxDistanceFromPlayer;
-
         time += Time.deltaTime * cameraModel.FollowSpeed * (playerMotionStateService.State == CharacterState.idle ? -1 : 1);
         time = Mathf.Clamp(time, 0, 1);
-        Vector3 movementDistance = Vector3.back * distanceToPlayer;
+
+        Vector3 desiredCameraPosition = playerAttackStateService.Charging ? cameraModel.AimedCameraPosition : cameraModel.CameraPosition;
+
+        Vector3 movementDistance = (playerAttackStateService.Charging ? (Vector3.forward * .4f) : Vector3.back) * cameraModel.MaxDistanceFromPlayer;
         cam.transform.localPosition = Vector3.Lerp(
-            cameraModel.CameraPosition,
-            cameraModel.CameraPosition + movementDistance,
+            desiredCameraPosition,
+            desiredCameraPosition + movementDistance,
             time
         );
     }
