@@ -4,8 +4,7 @@ using UnityEngine;
 public class PlayerAttackStateService : MonoBehaviour
 {
     private PlayerAimController playerAimController;
-    private PlayerMotionStateService playerMotionStateService;
-    [SerializeField] private Player player;
+    [SerializeField] private PlayerMotionStateService playerMotionStateService;
     [SerializeField, ReadOnly] private bool isAttacking = false;
     [SerializeField, ReadOnly] private bool charging = false;
     [SerializeField, ReadOnly] private bool disarmed = false;
@@ -20,7 +19,6 @@ public class PlayerAttackStateService : MonoBehaviour
     private void Awake()
     {
         playerAimController = GetComponent<PlayerAimController>();
-        playerMotionStateService = player.GetComponent<PlayerMotionStateService>();
     }
     private void Update()
     {

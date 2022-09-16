@@ -1,13 +1,12 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Player))]
 public class PlayerMotionStateService : MonoBehaviour
 {
-    private Player player;
     private float vertical;
     private float horizontal;
-    [SerializeField] private float landHeight = 3;
+    [SerializeField] private float landHeight = 2.5f;
     [SerializeField] private GroundCheckController groundCheck;
+    [SerializeField, ReadOnly] private bool jumping = false;
     [SerializeField, ReadOnly] private float moveSpeed;
     [SerializeField, ReadOnly] private bool isJumping = false;
     [SerializeField, ReadOnly] private bool isRunning = false;
@@ -28,22 +27,20 @@ public class PlayerMotionStateService : MonoBehaviour
     public float FallHeight { get => fallHeight; }
     public float HeightFromGround { get => heightFromGround; }
     public CharacterState State { get => state; set => state = value; }
-
-    private void Awake()
-    {
-        player = GetComponent<Player>();
-    }
     private void Update()
     {
         GetInputs();
         CheckGrounded();
         State = SetState();
-        Speed = GetPlayerCurrentSpeed();
         moveSpeed = Mathf.Abs(horizontal) + Mathf.Abs(vertical);
     }
     private void CheckGrounded()
     {
-        aerialMaxPoint = isGrounded ? transform.position : aerialMaxPoint.y < transform.position.y ? transform.position : aerialMaxPoint;
+        aerialMaxPoint = isGrounded ?
+            transform.position
+            : aerialMaxPoint.y < transform.position.y ?
+                transform.position
+                : aerialMaxPoint;
         heightFromGround = transform.position.y - groundCheck.Hit.point.y;
         isGrounded = groundCheck.IsGrounded;
         float _height = aerialMaxPoint.y - groundCheck.Hit.point.y;
@@ -56,8 +53,14 @@ public class PlayerMotionStateService : MonoBehaviour
         isJumping = Input.GetKeyDown(KeyCode.Space);
         isRunning = Input.GetKey(KeyCode.LeftShift);
     }
-
-    private float GetPlayerCurrentSpeed() => isGrounded ? State == CharacterState.run ? player.RunSpeed : player.WalkSpeed : Speed;
+    public void SetPlayerCurrentSpeed(Character player)
+    {
+        Speed = isGrounded ?
+        State == CharacterState.run ?
+            player.runSpeed
+                : player.walkSpeed
+                : Speed;
+    }
 
     private CharacterState SetState()
     {
@@ -71,5 +74,4 @@ public class PlayerMotionStateService : MonoBehaviour
         }
         return CharacterState.walk;
     }
-
 }

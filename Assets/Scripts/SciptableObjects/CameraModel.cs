@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class CameraModel : MonoBehaviour
+[CreateAssetMenu(fileName = "Camera ", menuName = "CameraModel/New")]
+public class CameraModel : ScriptableObject
 {
     [SerializeField] private float followSpeed = 12;
     [SerializeField] private float xRotationSpeed = 8;

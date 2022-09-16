@@ -1,12 +1,11 @@
 using UnityEngine;
 
-[RequireComponent(typeof(CameraModel))]
 public class CameraController : MonoBehaviour
 {
+    [SerializeField] private CameraModel cameraModel;
     [SerializeField] private Transform playerTransform;
     [SerializeField] private PlayerMotionStateService playerMotionStateService;
     [SerializeField] private PlayerAttackStateService playerAttackStateService;
-    private CameraModel cameraModel;
     private Camera cam;
     private float MouseX { get; set; }
     private float MouseY { get; set; }
@@ -14,7 +13,6 @@ public class CameraController : MonoBehaviour
     private void Awake()
     {
         Cursor.visible = false;
-        cameraModel = GetComponent<CameraModel>();
         cam = transform.GetChild(0).GetComponent<Camera>();
     }
 

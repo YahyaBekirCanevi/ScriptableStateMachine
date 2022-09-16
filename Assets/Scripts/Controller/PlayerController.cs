@@ -1,70 +1,66 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Player))]
 [RequireComponent(typeof(CharacterController))]
-[RequireComponent(typeof(PlayerMotionStateService))]
-[RequireComponent(typeof(JumpService))]
 public class PlayerController : MonoBehaviour
 {
-    private Player player;
-    private PlayerMotionStateService playerMotionStateService;
-    [SerializeField] private PlayerAttackStateService playerAttackStateService;
-    private JumpService jumpService;
-    [SerializeField, Tooltip("Main Camera's Transform")] private Transform cam;
+    [Header("Basics")]
+    public Character player;
     private CharacterController controller;
-    [SerializeField, ReadOnly] private Vector3 movementDirection;
-    [SerializeField, ReadOnly] private bool jumping = false;
-    [SerializeField] private WeaponDraw weaponDraw;
+    [SerializeField, Tooltip("Main Camera's Transform")] private Transform cameraTransform;
     [SerializeField] private Transform lowestPoint, lastActivePosition;
+    [Header("Movement")]
+    [SerializeField, ReadOnly] private Vector3 velocity;
+    [SerializeField, ReadOnly] private bool jumping = false;
+    public Vector3 Velocity { get => velocity; private set => velocity = value; }
+    [Header("Services")]
+    [SerializeField] private PlayerAttackStateService playerAttackStateService;
+    [SerializeField] private PlayerMotionStateService playerMotionStateService;
+    [SerializeField] private JumpService jumpService;
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-        player = GetComponent<Player>();
-        playerMotionStateService = GetComponent<PlayerMotionStateService>();
-        jumpService = GetComponent<JumpService>();
     }
     private void Update()
     {
-        ReplaceFallenPlayer();
-    }
-
-    private void ReplaceFallenPlayer()
-    {
+        playerMotionStateService.SetPlayerCurrentSpeed(player);
         if (playerMotionStateService.IsGrounded)
         {
-            lastActivePosition.position = transform.position + Vector3.up * 2 - movementDirection * .6f;
+            lastActivePosition.position = transform.position
+                + Vector3.up * 2
+                - Velocity * .6f;
             lastActivePosition.rotation = transform.rotation;
         }
-        if (transform.position.y < lowestPoint.position.y)
+        else if (transform.position.y < lowestPoint.position.y)
         {
             transform.position = lastActivePosition.position;
             transform.rotation = lastActivePosition.rotation;
         }
         else
         {
-            CorrespondPlayerMovement();
+            Vector3 movement = CorrespondPlayerMovement();
+
+            controller.Move(movement);
         }
     }
 
-    private void CorrespondPlayerMovement()
+    private Vector3 CorrespondPlayerMovement()
     {
-        movementDirection =
-            cam.forward * playerMotionStateService.Vertical
-            + cam.right * playerMotionStateService.Horizontal;
+        velocity = cameraTransform.forward * playerMotionStateService.Vertical
+            + cameraTransform.right * playerMotionStateService.Horizontal;
 
-        movementDirection.y = 0;
-        movementDirection = movementDirection.normalized * playerMotionStateService.Speed;
+        velocity.y = 0;
+        velocity = velocity.normalized * playerMotionStateService.Speed;
         if (playerAttackStateService.Charging)
         {
-            Vector3 forward = cam.forward;
+            Vector3 forward = cameraTransform.forward;
             forward.y = 0;
             forward.Normalize();
             transform.forward = forward;
         }
         else
         {
-            if (movementDirection != Vector3.zero)
-                transform.forward = movementDirection;
+            if (velocity != Vector3.zero)
+                transform.forward = velocity;
         }
         if (playerMotionStateService.IsGrounded)
         {
@@ -72,7 +68,7 @@ public class PlayerController : MonoBehaviour
             {
                 jumping = true;
                 StartCoroutine(jumpService.Jump(
-                    player.JumpStrength,
+                    player.jumpStrength,
                     afterJump: () => jumping = false
                 ));
             }
@@ -80,7 +76,7 @@ public class PlayerController : MonoBehaviour
         }
         float verticalValue = jumping ? jumpService.VerticalForceMagnitude : GameManagerService.Instance.Gravity;
         Vector3 verticalForce = Vector3.up * verticalValue;
-        Vector3 move = verticalForce + movementDirection;
-        controller.Move(move * Time.deltaTime);
+        Vector3 move = verticalForce + velocity;
+        return move * Time.deltaTime;
     }
 }
