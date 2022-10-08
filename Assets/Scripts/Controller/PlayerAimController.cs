@@ -1,29 +1,48 @@
-using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(PlayerAttackStateService))]
 public class PlayerAimController : MonoBehaviour
 {
-    private PlayerAttackStateService playerAttackStateService;
-    [SerializeField] private String targetTag;
-    [SerializeField] private LayerMask targetLayer;
-    [SerializeField] private Transform barrel;
+    WeaponDraw _weaponDraw;
+    CameraController _cameraController;
+    PlayerController _playerController;
+    [SerializeField] WeaponModel weaponModel;
+    [SerializeField] LayerMask targetLayer;
+    [SerializeField] CharacterSOController target;
 
     [Tooltip("If Raycast hits the target this turns to true")]
-    [SerializeField, ReadOnly] private bool rayHitTarget;
-    public CharacterSOController HitTarget { get => RaycastToMiddleOfScreen(); }
+    [SerializeField, ReadOnly] bool rayHitTarget;
+    float pressTime = 0;
     private void Awake()
     {
-        playerAttackStateService = GetComponent<PlayerAttackStateService>();
+        _cameraController = Camera.main.GetComponentInParent<CameraController>();
+        _playerController = GetComponentInParent<PlayerController>();
+        _weaponDraw = GetComponentInParent<WeaponDraw>();
+
+        PlayerController.PlayerInput.CharacterControls.Fire.started += PlayerInputActions_PressDown;
+        PlayerController.PlayerInput.CharacterControls.Fire.canceled += PlayerInputActions_PressUp;
     }
-    private CharacterSOController RaycastToMiddleOfScreen()
+    private void PlayerInputActions_PressDown(InputAction.CallbackContext context)
     {
-        RaycastHit hit;
-        Ray ray = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        /* barrel.position */
-        rayHitTarget = Physics.Raycast(ray, out hit, 200, targetLayer);
-        CharacterSOController targetController = null;
-        rayHitTarget = rayHitTarget && hit.collider.gameObject.TryGetComponent(out targetController);
-        return targetController;
+        _playerController.Animator.SetBool("charge", true);
+        pressTime = Time.time;
+    }
+    private void PlayerInputActions_PressUp(InputAction.CallbackContext context)
+    {
+        _playerController.Animator.SetBool("chargeButtonUp", true);
+        CastRay();
+        if (target != null)
+        {
+            target.TakeDamage(weaponModel.Damage);
+        }
+        pressTime = 0;
+    }
+    private void CastRay()
+    {
+        rayHitTarget = _cameraController.RaycastToMiddleOfScreen(targetLayer, out target);
+    }
+    private void Update()
+    {
+        _weaponDraw.Attacking = pressTime != 0;
     }
 }

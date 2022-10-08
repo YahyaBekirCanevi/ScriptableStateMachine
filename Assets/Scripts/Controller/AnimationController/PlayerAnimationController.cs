@@ -1,17 +1,13 @@
-using System.Collections;
 using UnityEngine;
 
 public class PlayerAnimationController : MonoBehaviour
 {
-    private float speed = 0;
-    [SerializeField] private PlayerMotionStateService playerMotionStateService;
-    [SerializeField] private PlayerAttackStateService playerAttackStateService;
     private Animator anim;
     private void Awake()
     {
         anim = GetComponent<Animator>();
     }
-    private void Update()
+    /* private void Update()
     {
         if (playerMotionStateService.State == CharacterState.idle && anim.GetFloat("random") == 0)
             StartCoroutine("RandomEmote");
@@ -72,5 +68,5 @@ public class PlayerAnimationController : MonoBehaviour
         speed = Mathf.Lerp(speed, newSpeed, Time.deltaTime * 12f);
 
         anim.SetFloat("speed", speed);
-    }
+    } */
 }

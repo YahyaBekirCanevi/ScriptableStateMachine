@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10860d062f4a04748b8a8e4294c1b493, type: 3}
-  m_Name: Player
+  m_Script: {fileID: 11500000, guid: d7d33d7252336a54a938d5e1ba00ad41, type: 3}
+  m_Name: Bow
   m_EditorClassIdentifier: 
-  characterName: Albedo
-  hitPoint: 100
+  damage: 20
+  hasCapacity: 1
+  capacity: 20

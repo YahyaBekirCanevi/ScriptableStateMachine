@@ -12,12 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b8c48e0c25d9df49b7a9cc7a7ed3dfe, type: 3}
   m_Name: Camera 1
   m_EditorClassIdentifier: 
-  followSpeed: 0.6
-  xRotationSpeed: 4
-  yRotationSpeed: 2
+  followSpeed: 12
+  sensitivity: {x: 1.8, y: 1}
   offset: {x: 0, y: 1, z: 0}
-  cameraPosition: {x: 0, y: 0.5, z: -2}
+  cameraPosition: {x: 0, y: 0.5, z: -4}
   aimedCameraPosition: {x: 1, y: 0.5, z: -1.6}
   clampMin: -40
-  clampMax: 30
-  maxDistanceFromPlayer: 1
+  clampMax: 50
+  maxDistanceFromPlayer: 0.4
