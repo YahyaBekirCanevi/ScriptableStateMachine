@@ -2,17 +2,16 @@ using UnityEngine;
 
 public class CharacterSOController : MonoBehaviour
 {
-    private float maxHitPoint;
     private float currentHitPoint;
     [SerializeField] private Character character;
     private void Awake()
     {
-        currentHitPoint = maxHitPoint = character.hitPoint;
+        currentHitPoint = character.hitPoint;
     }
     public void Heal(float amount)
     {
         currentHitPoint += amount;
-        currentHitPoint = currentHitPoint > maxHitPoint ? maxHitPoint : currentHitPoint;
+        currentHitPoint = currentHitPoint > character.hitPoint ? character.hitPoint : currentHitPoint;
     }
     public void TakeDamage(float amount)
     {

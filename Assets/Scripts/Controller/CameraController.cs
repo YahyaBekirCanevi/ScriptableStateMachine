@@ -1,67 +1,69 @@
+using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(CameraModel))]
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] private Transform playerTransform;
-    [SerializeField] private PlayerMotionStateService playerMotionStateService;
-    [SerializeField] private PlayerAttackStateService playerAttackStateService;
-    private CameraModel cameraModel;
-    private Camera cam;
-    private float MouseX { get; set; }
-    private float MouseY { get; set; }
-    Vector3 velocity = Vector3.zero;
+    public CameraModel Camera;
+    public PlayerController Target;
+    public Transform Cam;
+    private Camera _camera;
+    float _distanceTime = 0;
+    Vector2 rotation = Vector2.zero;
+    public bool Aim { get => Target != null ? Target.Animator.GetBool("charge") : false; }
     private void Awake()
     {
-        Cursor.visible = false;
-        cameraModel = GetComponent<CameraModel>();
-        cam = transform.GetChild(0).GetComponent<Camera>();
-    }
+        PlayerController.PlayerInput.CharacterControls.Look.started += PlayerInputActions_OnLook;
+        PlayerController.PlayerInput.CharacterControls.Look.performed += PlayerInputActions_OnLook;
+        PlayerController.PlayerInput.CharacterControls.Look.canceled += PlayerInputActions_OnLook;
 
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        _camera = Cam.GetComponent<Camera>();
+    }
+    private void PlayerInputActions_OnLook(InputAction.CallbackContext context)
+    {
+        Vector2 delta = context.ReadValue<Vector2>() * .04f;
+        delta.y *= -1;
+        rotation += delta * Camera.Sensitivity;
+        rotation.y = Math.Clamp(rotation.y, Camera.ClampMin, Camera.ClampMax);
+    }
     private void Update()
     {
-        LockCursor();
-        GetInputs();
-        Rotate();
+        transform.rotation = Quaternion.Euler(rotation.y, rotation.x, 0);
     }
     private void LateUpdate()
     {
-        FollowPlayer();
-    }
-    private void LockCursor()
-    {
-        Cursor.lockState = CursorLockMode.Locked;
-    }
-    private void GetInputs()
-    {
-        MouseX += Input.GetAxis("Mouse X") * cameraModel.XRotationSpeed;
-        MouseY -= Input.GetAxis("Mouse Y") * cameraModel.YRotationSpeed;
-        MouseY = Mathf.Clamp(MouseY, cameraModel.ClampMin, cameraModel.ClampMax);
-    }
-    float time1 = 1;
-    float time2 = 1;
-    private void FollowPlayer()
-    {
-        Vector3 desiredPosition = playerTransform.position + cameraModel.Offset;
-        transform.position = desiredPosition;
+        transform.position = Target.transform.position + Camera.Offset;
+        Vector3 localPosition = Cam.localPosition;
+        if (Aim)
+        {
+            localPosition = Camera.AimedCameraPosition;
+        }
+        else
+        {
+            float direction = Target.MoveSpeed > .1f ? 1 : -1;
+            _distanceTime += Time.deltaTime * direction * Camera.FollowSpeed;
+            _distanceTime = Math.Clamp(_distanceTime, 0, 1);
+            localPosition = Vector3.Lerp(
+                Camera.CameraPosition,
+                Camera.CameraPosition - Vector3.forward * Camera.MaxDistanceFromPlayer * (Target.IsRunning ? 2 : 1),
+                _distanceTime
+            );
+        }
+        Cam.localPosition = Vector3.Lerp(Cam.localPosition, localPosition, Time.deltaTime * Camera.FollowSpeed);
 
-        time1 += Time.deltaTime * cameraModel.FollowSpeed * (playerMotionStateService.State == CharacterState.idle ? -1 : 1);
-        time1 = Mathf.Clamp(time1, 0, 1);
-
-        time2 += Time.deltaTime * 2 * (playerAttackStateService.Charging ? 1 : -1);
-        time2 = Mathf.Clamp(time2, 0, 1);
-
-        Vector3 desiredCameraPosition = Vector3.Lerp(cameraModel.CameraPosition, cameraModel.AimedCameraPosition, time2);
-
-        Vector3 movementDistance = (playerAttackStateService.Charging ? (Vector3.forward * .4f) : Vector3.back) * cameraModel.MaxDistanceFromPlayer;
-        cam.transform.localPosition = Vector3.Lerp(
-            desiredCameraPosition,
-            desiredCameraPosition + movementDistance,
-            time1
-        );
     }
-    private void Rotate()
+    public bool RaycastToMiddleOfScreen(LayerMask targetLayer, out CharacterSOController targetController)
     {
-        transform.rotation = Quaternion.Euler(MouseY, MouseX, 0);
+        RaycastHit hit;
+        targetController = null;
+        Ray ray = _camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        /* barrel.position */
+        bool rayHitTarget = Physics.Raycast(ray, out hit, 200, targetLayer);
+        if (rayHitTarget)
+            if (hit.collider.gameObject.TryGetComponent(out CharacterSOController c))
+                targetController = c;
+        return rayHitTarget;
     }
 }
