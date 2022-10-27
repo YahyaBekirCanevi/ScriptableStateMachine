@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class CharacterSOController : MonoBehaviour
 {
-    private float currentHitPoint;
-    [SerializeField] private Character character;
+    float currentHitPoint;
+    [SerializeField] Character character;
+    public Character Character { get => character; set => character = value; }
     private void Awake()
     {
         currentHitPoint = character.hitPoint;

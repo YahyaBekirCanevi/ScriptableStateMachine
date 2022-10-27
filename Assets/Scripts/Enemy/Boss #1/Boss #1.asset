@@ -10,7 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 10860d062f4a04748b8a8e4294c1b493, type: 3}
-  m_Name: Enemy
+  m_Name: Boss #1
   m_EditorClassIdentifier: 
-  characterName: Enemy
-  hitPoint: 20
+  characterName: Boss #1
+  hitPoint: 1000
+  walkSpeed: 0
+  runSpeed: 0
+  jumpStrength: 0

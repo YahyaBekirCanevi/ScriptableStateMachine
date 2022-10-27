@@ -1,6 +1,6 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Camera ", menuName = "SO/CameraModel")]
+[CreateAssetMenu(fileName = "Camera ", menuName = "SO/Camera Model")]
 public class CameraModel : ScriptableObject
 {
     [SerializeField] private float followSpeed = 12;
