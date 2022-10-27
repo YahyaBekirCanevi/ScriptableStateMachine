@@ -18,7 +18,6 @@ public class AttackWithBowController : StateMachineBehaviour
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         animator.SetBool("charge", false);
-        animator.SetBool("chargeButtonUp", false);
     }
 
     // OnStateMove is called right after Animator.OnAnimatorMove()

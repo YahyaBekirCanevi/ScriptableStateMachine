@@ -6,9 +6,9 @@ public class PlayerAimController : MonoBehaviour
     WeaponDraw _weaponDraw;
     CameraController _cameraController;
     PlayerController _playerController;
-    [SerializeField] WeaponModel weaponModel;
+    [SerializeField] BaseAttack weaponModel;
     [SerializeField] LayerMask targetLayer;
-    [SerializeField] CharacterSOController target;
+    [SerializeField, ReadOnly] CharacterSOController target;
 
     [Tooltip("If Raycast hits the target this turns to true")]
     [SerializeField, ReadOnly] bool rayHitTarget;
@@ -24,6 +24,7 @@ public class PlayerAimController : MonoBehaviour
     }
     private void PlayerInputActions_PressDown(InputAction.CallbackContext context)
     {
+        _playerController.Animator.SetBool("chargeButtonUp", false);
         _playerController.Animator.SetBool("charge", true);
         pressTime = Time.time;
     }

@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 10860d062f4a04748b8a8e4294c1b493, type: 3}
-  m_Name: Fly
+  m_Script: {fileID: 11500000, guid: 82c043c5045c6ce45bc41e44a2250031, type: 3}
+  m_Name: Idle Boss1
   m_EditorClassIdentifier: 
-  characterName: Fly
-  hitPoint: 50
+  transitions:
+  - {fileID: 11400000, guid: fbd3010d67938764cb7e33f63091c522, type: 2}
+  - {fileID: 11400000, guid: 1a3aceeee98a34548a7c99b10f49b330, type: 2}
